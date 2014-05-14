@@ -18,7 +18,7 @@ class InvoiceLine:
                 self.invoice.type in ['out_invoice', 'out_credit_note'] and \
                 self.product:
             with Transaction().set_context({
-                    'price_list': self.invoice.party.sale_price_list,
+                    'price_list': self.invoice.party.sale_price_list.id,
                     'customer': self.invoice.party.id,
                 }):
                 res['unit_price'] = Product.get_sale_price([self.product],
