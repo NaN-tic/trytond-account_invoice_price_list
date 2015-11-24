@@ -12,7 +12,7 @@ __metaclass__ = PoolMeta
 class InvoiceLine:
     __name__ = 'account.invoice.line'
 
-    @fields.depends('party', 'invoice')
+    @fields.depends('party', 'invoice', 'quantity')
     def on_change_product(self):
         Product = Pool().get('product.product')
 
@@ -25,7 +25,10 @@ class InvoiceLine:
             with Transaction().set_context({
                     'price_list': party.sale_price_list.id,
                     'customer': party.id,
-                }):
-
+                    }):
                 prices = Product.get_sale_price([self.product], self.quantity or 0)
                 self.unit_price = prices[self.product.id]
+        elif self.product:
+            self.unit_price = self.product.list_price
+        else:
+            self.unit_price = None
