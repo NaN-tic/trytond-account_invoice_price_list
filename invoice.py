@@ -16,7 +16,6 @@ class InvoiceLine:
     def on_change_product(self):
         Product = Pool().get('product.product')
 
-        super(InvoiceLine, self).on_change_product()
         party = self.party or self.invoice.party
 
         invoice_type = self.invoice.type if self.invoice else self.invoice_type
@@ -32,3 +31,5 @@ class InvoiceLine:
             self.unit_price = self.product.list_price
         else:
             self.unit_price = None
+
+        super(InvoiceLine, self).on_change_product()
