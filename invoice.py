@@ -16,7 +16,9 @@ class InvoiceLine:
     def on_change_product(self):
         Product = Pool().get('product.product')
 
-        party = self.party or self.invoice.party
+        party = self.party or self.invoice and self.invoice.party
+        if not party:
+            super(InvoiceLine, self).on_change_product()
 
         invoice_type = self.invoice.type if self.invoice else self.invoice_type
         if (party and party.sale_price_list and self.product
