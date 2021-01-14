@@ -13,14 +13,14 @@ class InvoiceLine(metaclass=PoolMeta):
 
     @fields.depends('product', 'party', 'invoice', 'quantity', 'invoice_type',
         '_parent_invoice.type', '_parent_invoice.party', 'unit_price',
-        'gross_unit_price', methods=[])
+        methods=[])
     def on_change_product(self):
         self.get_price_list()
         super(InvoiceLine, self).on_change_product()
 
     @fields.depends('product', 'party', 'invoice', 'quantity', 'invoice_type',
         '_parent_invoice.type', '_parent_invoice.party', 'unit_price',
-        'gross_unit_price', methods=[])
+        methods=[])
     def on_change_quantity(self):
         self.get_price_list()
         try:
