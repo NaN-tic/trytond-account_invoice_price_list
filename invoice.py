@@ -11,16 +11,12 @@ __all__ = ['InvoiceLine']
 class InvoiceLine(metaclass=PoolMeta):
     __name__ = 'account.invoice.line'
 
-    @fields.depends('product', 'party', 'invoice', 'quantity', 'invoice_type',
-        '_parent_invoice.type', '_parent_invoice.party', 'unit_price',
-        methods=[])
+    @fields.depends(methods=['get_price_list'])
     def on_change_product(self):
         self.get_price_list()
         super(InvoiceLine, self).on_change_product()
 
-    @fields.depends('product', 'party', 'invoice', 'quantity', 'invoice_type',
-        '_parent_invoice.type', '_parent_invoice.party', 'unit_price',
-        methods=[])
+    @fields.depends(methods=['get_price_list'])
     def on_change_quantity(self):
         self.get_price_list()
         try:
@@ -28,6 +24,8 @@ class InvoiceLine(metaclass=PoolMeta):
         except:
             pass
 
+    @fields.depends('product', 'party', 'invoice', 'quantity', 'invoice_type',
+        '_parent_invoice.type', '_parent_invoice.party', 'unit_price')
     def get_price_list(self):
         pool = Pool()
         Product = pool.get('product.product')
