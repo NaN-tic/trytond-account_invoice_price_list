@@ -11,9 +11,25 @@ __all__ = ['InvoiceLine']
 class InvoiceLine(metaclass=PoolMeta):
     __name__ = 'account.invoice.line'
 
-    @fields.depends('party', 'invoice', 'quantity')
+    @fields.depends(methods=['get_price_list'])
     def on_change_product(self):
-        Product = Pool().get('product.product')
+        self.get_price_list()
+        super(InvoiceLine, self).on_change_product()
+
+    @fields.depends(methods=['get_price_list'])
+    def on_change_quantity(self):
+        self.get_price_list()
+        try:
+            super(InvoiceLine, self).on_change_quantity()
+        except:
+            pass
+
+    @fields.depends('product', 'party', 'invoice', 'quantity', 'invoice_type',
+        '_parent_invoice.type', '_parent_invoice.party', 'unit_price')
+    def get_price_list(self):
+        pool = Pool()
+        Product = pool.get('product.product')
+        ProductSupplierPrice = pool.get('purchase.product_supplier.price')
 
         party = self.party or self.invoice and self.invoice.party
         if not party:
@@ -26,11 +42,21 @@ class InvoiceLine(metaclass=PoolMeta):
                     'price_list': party.sale_price_list.id,
                     'customer': party.id,
                     }):
-                prices = Product.get_sale_price([self.product], self.quantity or 0)
+                prices = Product.get_sale_price([self.product], self.quantity or
+                    0)
+                self.unit_price = prices[self.product.id]
+        elif party and self.product and invoice_type == 'in':
+            with Transaction().set_context({
+                    'supplier': party.id,
+                    }):
+                if self.product.product_suppliers:
+                    prices = Product.get_purchase_price([self.product],
+                        self.quantity or 0)
+                else:
+                    prices = Product.get_purchase_price([self.product],
+                        self.quantity or 0)
                 self.unit_price = prices[self.product.id]
         elif self.product:
             self.unit_price = self.product.list_price
         else:
             self.unit_price = None
-
-        super(InvoiceLine, self).on_change_product()
