@@ -19,9 +19,9 @@ Imports::
     ...     set_fiscalyear_invoice_sequences, create_payment_term
     >>> today = datetime.date.today()
 
-Install account_invoice_price_list module::
+Install purchase and account_invoice_price_list module::
 
-    >>> config = activate_modules('account_invoice_price_list')
+    >>> config = activate_modules(['account_invoice_price_list', 'purchase'])
 
 Create company::
 
@@ -71,6 +71,8 @@ Create product::
     >>> template.account_category = account_category
     >>> template.save()
     >>> product, = template.products
+    >>> product.cost_price = Decimal('30.00')
+    >>> product.save()
 
 Create Customer invoice::
 
@@ -103,7 +105,7 @@ Supplier: Add line defining product (Unit Price is calculated)::
     >>> supplier_invoice.lines.append(supplier_line)
     >>> supplier_line.product = product
     >>> supplier_line.quantity = 2
-    >>> supplier_line.unit_price == Decimal('20.00')
+    >>> supplier_line.unit_price == Decimal('30.00')
     True
-    >>> supplier_line.amount == Decimal('40.00')
+    >>> supplier_line.amount == Decimal('60.00')
     True
