@@ -29,7 +29,6 @@ class InvoiceLine(metaclass=PoolMeta):
     def get_price_list(self):
         pool = Pool()
         Product = pool.get('product.product')
-        ProductSupplierPrice = pool.get('purchase.product_supplier.price')
 
         party = self.party or self.invoice and self.invoice.party
         if not party:
@@ -45,16 +44,13 @@ class InvoiceLine(metaclass=PoolMeta):
                 prices = Product.get_sale_price([self.product], self.quantity or
                     0)
                 self.unit_price = prices[self.product.id]
-        elif party and self.product and invoice_type == 'in':
+        elif (party and self.product and invoice_type == 'in' and hasattr(
+                    self.product, 'product_suppliers')):
             with Transaction().set_context({
                     'supplier': party.id,
                     }):
-                if self.product.product_suppliers:
-                    prices = Product.get_purchase_price([self.product],
-                        self.quantity or 0)
-                else:
-                    prices = Product.get_purchase_price([self.product],
-                        self.quantity or 0)
+                prices = Product.get_purchase_price([self.product],
+                    self.quantity or 0)
                 self.unit_price = prices[self.product.id]
         elif self.product:
             self.unit_price = self.product.list_price
