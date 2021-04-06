@@ -52,7 +52,5 @@ class InvoiceLine(metaclass=PoolMeta):
                 prices = Product.get_purchase_price([self.product],
                     self.quantity or 0)
                 self.unit_price = prices[self.product.id]
-        elif self.product:
+        elif not self.unit_price and self.product:
             self.unit_price = self.product.list_price
-        else:
-            self.unit_price = None
