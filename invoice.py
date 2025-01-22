@@ -5,8 +5,6 @@ from trytond.pool import Pool, PoolMeta
 from trytond.model import fields
 from trytond.transaction import Transaction
 
-__all__ = ['InvoiceLine']
-
 
 class InvoiceLine(metaclass=PoolMeta):
     __name__ = 'account.invoice.line'
@@ -21,7 +19,7 @@ class InvoiceLine(metaclass=PoolMeta):
         self.get_price_list()
         try:
             super(InvoiceLine, self).on_change_quantity()
-        except:
+        except AttributeError:
             pass
 
     @fields.depends('product', 'party', 'invoice', 'quantity', 'invoice_type',
