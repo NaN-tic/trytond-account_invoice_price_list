@@ -51,4 +51,4 @@ class InvoiceLine(metaclass=PoolMeta):
                     self.quantity or 0)
                 self.unit_price = prices[self.product.id]
         elif not self.unit_price and self.product:
-            self.unit_price = self.product.list_price
+            self.unit_price = self.product.list_price_used
